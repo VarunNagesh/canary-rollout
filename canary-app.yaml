@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: canary-pod
-          image: vvaarruunn/demo_live_ready:1  # Replace with your Docker image name
+          image: vvaarruunn/demo_live_ready:2  # Replace with your Docker image name
           ports:
             - containerPort: 3000
           readinessProbe:
