@@ -1,50 +1,36 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
-  name: canary-deployment
+  name: rollouts-demo
 spec:
-  replicas: 3
+  replicas: 1
+  strategy:
+    canary:
+      canaryService: rollouts-demo-canary
+      stableService: rollouts-demo-stable
+      trafficRouting:
+        nginx:
+          stableIngress: rollouts-demo-stable
+      steps:
+      - setWeight: 5
+      - pause: {}
+  revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: canary
+      app: rollouts-demo
   template:
     metadata:
       labels:
-        app: canary
+        app: rollouts-demo
     spec:
       containers:
-        - name: canary-pod
-          image: vvaarruunn/demo_live_ready:v3  # Replace with your Docker image name
-          ports:
-            - containerPort: 3000
-          readinessProbe:
-            httpGet:
-              path: /ready  # Replace with the actual path that indicates readiness in your application
-              port: 3000
-            initialDelaySeconds: 1 # Delay before the first probe
-            periodSeconds: 1
-          livenessProbe:
-            httpGet:
-              path: /live  # Replace with the actual path that indicates readiness in your application
-              port: 3000
-            initialDelaySeconds: 1 # Delay before the first probe
-            periodSeconds: 1 
-  strategy:
-    canary:
-      steps:
-        - setWeight: 50
-        - pause: {}
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: canary-service
-spec:
-  selector:
-    app: canary
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 3000
-  type: ClusterIP
+      - name: rollouts-demo
+        image: argoproj/rollouts-demo:blue
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        resources:
+          requests:
+            memory: 32Mi
+            cpu: 5m
