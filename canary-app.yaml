@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
-kind: Rollout
+kind: Rollout  # CRD kind
 metadata:
   name: rollouts-demo
 spec:
   replicas: 1
   strategy:
-    canary:
-      canaryService: rollouts-demo-canary
-      stableService: rollouts-demo-stable
+    canary:        # deployment strategy to use
+      canaryService: rollouts-demo-canary  # canary service name
+      stableService: rollouts-demo-stable  # stable service name
       trafficRouting:
         nginx:
-          stableIngress: rollouts-demo-stable
+          stableIngress: rollouts-demo-stable  #ingress name
       steps:
-      - setWeight: 5
-      - pause: {}
+      - setWeight: 5  # percentage of traffic to be routed to new version
+      - pause: {}  # pausing indefinitely after rolling out the new version 
   revisionHistoryLimit: 2
   selector:
     matchLabels:
